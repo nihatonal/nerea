@@ -188,7 +188,7 @@ export default function EveningExperience() {
         </div>
       </section>
       {/* Mobile stacked reveal */}
-      
+
       <section className="relative bg-[#080604] text-white md:hidden">
         {items.map((item, index) => (
           <article
@@ -198,17 +198,19 @@ export default function EveningExperience() {
               zIndex: index + 1,
             }}
           >
-            <Image
-              src={item.image}
-              alt={item.title}
-              fill
-              priority={index === 0}
-              className="object-cover"
-              sizes="100vw"
-            />
+            <div className="absolute inset-0">
+              <Image
+                src={item.image}
+                alt={item.title}
+                fill
+                priority={index === 0}
+                className="object-cover"
+                sizes="(max-width: 767px) 100vw, 50vw"
+              />
+            </div>
 
-            <div className="absolute inset-0 bg-black/45" />
-            <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.92)_0%,rgba(0,0,0,0.65)_34%,transparent_70%)]" />
+            <div className="absolute inset-0 bg-black/20" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.25)_34%,transparent_70%)]" />
 
             <div className="absolute inset-x-0 bottom-0 px-7 pb-28">
               <p className="text-[10px] uppercase tracking-[0.42em] text-white/50">

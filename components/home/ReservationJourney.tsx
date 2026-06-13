@@ -80,7 +80,7 @@ export default function ReservationJourney() {
     >
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(212,175,55,0.09),transparent_45%)]" />
 
-      <div className="relative z-10 mx-auto grid max-w-[1500px] gap-14 md:grid-cols-[0.9fr_1.1fr] md:items-end">
+      <div className="relative z-10 mx-auto grid max-w-375 gap-14 md:grid-cols-[0.9fr_1.1fr] md:items-end">
         <div ref={headingRef}>
           <p className="text-xs uppercase tracking-[0.45em] text-white/45">
             Reservation Journey

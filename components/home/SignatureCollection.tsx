@@ -96,7 +96,7 @@ export default function SignatureCollection() {
         <div className="hidden gap-3 md:flex">
           <button
             onClick={goToPrevious}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 text-white transition hover:border-white/60 hover:bg-white/10"
+            className="hover:cursor-pointer flex h-12 w-12 items-center justify-center rounded-full border border-white/20 text-white transition hover:border-white/60 hover:bg-white/10"
             aria-label="Previous slide"
           >
             <ArrowLeft size={18} />
@@ -104,7 +104,7 @@ export default function SignatureCollection() {
 
           <button
             onClick={goToNext}
-            className="flex h-12 w-12 items-center justify-center rounded-full border border-white/20 text-white transition hover:border-white/60 hover:bg-white/10"
+            className="hover:cursor-pointer flex h-12 w-12 items-center justify-center rounded-full border border-white/20 text-white transition hover:border-white/60 hover:bg-white/10"
             aria-label="Next slide"
           >
             <ArrowRight size={18} />
