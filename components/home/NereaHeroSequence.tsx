@@ -9,8 +9,13 @@ gsap.registerPlugin(ScrollTrigger);
 
 const FRAME_COUNT = 240;
 
-const currentFrame = (index: number) =>
-  `/images/nerea-hero/frame_${String(index + 1).padStart(6, "0")}.webp`;
+const currentFrame = (index: number, isMobile: boolean) => {
+  const folder = isMobile ? "mobile" : "desktop";
+  return `/images/nerea-hero/${folder}/frame_${String(index + 1).padStart(
+    6,
+    "0",
+  )}.webp`;
+};
 
 export default function NereaHeroSequence() {
   const sectionRef = useRef<HTMLElement | null>(null);
@@ -26,6 +31,8 @@ export default function NereaHeroSequence() {
     const context = canvas.getContext("2d");
     if (!context) return;
 
+    const isMobile = window.innerWidth < 768;
+
     const lenis = new Lenis({
       duration: 1.15,
       smoothWheel: true,
@@ -39,11 +46,10 @@ export default function NereaHeroSequence() {
 
     gsap.ticker.add(raf);
     gsap.ticker.lagSmoothing(0);
-
     lenis.on("scroll", ScrollTrigger.update);
 
     const setCanvasSize = () => {
-      const dpr = Math.min(window.devicePixelRatio, 2);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
@@ -52,33 +58,32 @@ export default function NereaHeroSequence() {
       canvas.style.height = `${window.innerHeight}px`;
 
       context.setTransform(dpr, 0, 0, dpr, 0, 0);
+      context.imageSmoothingEnabled = true;
+      context.imageSmoothingQuality = "high";
     };
-
-    context.imageSmoothingEnabled = true;
-    context.imageSmoothingQuality = "high";
 
     const render = () => {
       const image = imagesRef.current[Math.round(frameRef.current.frame)];
       if (!image || !image.complete || image.naturalWidth === 0) return;
 
-      context.clearRect(0, 0, canvas.width, canvas.height);
+      context.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-      const canvasRatio = canvas.width / canvas.height;
+      const canvasRatio = window.innerWidth / window.innerHeight;
       const imageRatio = image.width / image.height;
 
-      let drawWidth = canvas.width;
-      let drawHeight = canvas.height;
+      let drawWidth = window.innerWidth;
+      let drawHeight = window.innerHeight;
       let offsetX = 0;
       let offsetY = 0;
 
       if (imageRatio > canvasRatio) {
-        drawHeight = canvas.height;
+        drawHeight = window.innerHeight;
         drawWidth = drawHeight * imageRatio;
-        offsetX = (canvas.width - drawWidth) / 2;
+        offsetX = (window.innerWidth - drawWidth) / 2;
       } else {
-        drawWidth = canvas.width;
+        drawWidth = window.innerWidth;
         drawHeight = drawWidth / imageRatio;
-        offsetY = (canvas.height - drawHeight) / 2;
+        offsetY = (window.innerHeight - drawHeight) / 2;
       }
 
       context.drawImage(image, offsetX, offsetY, drawWidth, drawHeight);
@@ -116,16 +121,13 @@ export default function NereaHeroSequence() {
 
     setCanvasSize();
 
-    let loadedImages = 0;
-
     for (let i = 0; i < FRAME_COUNT; i++) {
       const img = new Image();
-      img.src = currentFrame(i);
+      img.src = currentFrame(i, isMobile);
       imagesRef.current[i] = img;
 
       img.onload = () => {
-        loadedImages++;
-        if (loadedImages === 1) render();
+        if (i === 0) render();
       };
     }
 
@@ -157,7 +159,6 @@ export default function NereaHeroSequence() {
       tween.kill();
       ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
       window.removeEventListener("resize", handleResize);
-
       gsap.ticker.remove(raf);
       lenis.destroy();
     };
@@ -165,7 +166,7 @@ export default function NereaHeroSequence() {
 
   return (
     <section ref={sectionRef} className="relative h-[500vh] bg-black">
-      <div className="sticky top-0 h-screen overflow-hidden">
+      <div className="sticky top-0 h-svh overflow-hidden md:h-screen">
         <canvas ref={canvasRef} className="h-full w-full" />
 
         <div className="pointer-events-none absolute inset-0 bg-black/25" />
@@ -176,7 +177,7 @@ export default function NereaHeroSequence() {
           className="absolute inset-0 flex items-center px-6 md:px-20"
         >
           <div className="max-w-3xl">
-            <p className="text-xs uppercase tracking-[0.45em] text-white/60 md:text-sm">
+            <p className="text-xs uppercase tracking-[0.38em] text-white/60 md:text-sm md:tracking-[0.45em]">
               Fethiye Mediterranean House
             </p>
 
@@ -189,10 +190,10 @@ export default function NereaHeroSequence() {
 
         <div
           id="hero-final-text"
-          className="absolute inset-0 flex items-end justify-center px-6 pb-16 opacity-0 md:items-center md:pb-0"
+          className="absolute inset-0 flex items-end justify-center px-6 pb-20 opacity-0 md:items-center md:pb-0"
         >
           <div className="text-center">
-            <p className="text-xs uppercase tracking-[0.55em] text-white/60">
+            <p className="text-xs uppercase tracking-[0.45em] text-white/60 md:tracking-[0.55em]">
               Mediterranean House
             </p>
 
@@ -200,7 +201,7 @@ export default function NereaHeroSequence() {
               NEREA
             </h2>
 
-            <p className="mx-auto mt-6 max-w-xl text-sm leading-7 text-white/70 md:text-base">
+            <p className="mx-auto mt-6 max-w-sm text-sm leading-7 text-white/70 md:max-w-xl md:text-base">
               An intimate seaside dining experience above the moonlit
               Mediterranean.
             </p>
@@ -237,4 +238,4 @@ export default function NereaHeroSequence() {
       </div>
     </section>
   );
-}   
+}
