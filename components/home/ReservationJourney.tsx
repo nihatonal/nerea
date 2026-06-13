@@ -31,40 +31,49 @@ const steps = [
 export default function ReservationJourney() {
   const sectionRef = useRef<HTMLElement | null>(null);
   const headingRef = useRef<HTMLDivElement | null>(null);
-  const cardsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const section = sectionRef.current;
     const heading = headingRef.current;
-    const cards = cardsRef.current?.children;
+    const cards = gsap.utils.toArray<HTMLElement>(".reservation-card");
 
-    if (!section || !heading || !cards) return;
+    if (!section || !heading || cards.length === 0) return;
+
+    gsap.set(heading, {
+      autoAlpha: 0,
+      y: 24,
+    });
+
+    gsap.set(cards, {
+      autoAlpha: 0,
+      y: 18,
+    });
 
     const animation = gsap.timeline({
       scrollTrigger: {
         trigger: section,
-        start: "top 70%",
+        start: "top 78%",
         once: true,
       },
     });
 
     animation
-      .fromTo(
-        heading,
-        { opacity: 0, y: 40 },
-        { opacity: 1, y: 0, duration: 1, ease: "power3.out" },
-      )
-      .fromTo(
+      .to(heading, {
+        autoAlpha: 1,
+        y: 0,
+        duration: 0.9,
+        ease: "power2.out",
+      })
+      .to(
         cards,
-        { opacity: 0, y: 34 },
         {
-          opacity: 1,
+          autoAlpha: 1,
           y: 0,
-          duration: 0.85,
-          stagger: 0.15,
-          ease: "power3.out",
+          duration: 0.65,
+          stagger: 0.08,
+          ease: "power2.out",
         },
-        "-=0.55",
+        "-=0.35",
       );
 
     return () => {
@@ -105,36 +114,35 @@ export default function ReservationJourney() {
           </a>
         </div>
 
-        <div ref={cardsRef} className="grid gap-4">
+        <div className="grid gap-4">
           {steps.map((step) => {
             const Icon = step.icon;
 
             return (
-              <div
-                key={step.eyebrow}
-                className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] p-6 transition duration-500 hover:-translate-y-1 hover:border-white/30 hover:bg-white/[0.06] md:p-8"
-              >
-                <div className="pointer-events-none absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100">
-                  <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
-                </div>
-
-                <div className="relative z-10 flex items-start gap-5">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/20 text-white/70">
-                    <Icon size={18} />
+              <div key={step.eyebrow} className="reservation-card">
+                <div className="group relative overflow-hidden rounded-3xl border border-white/10 bg-white/[0.035] p-6 transition duration-500 hover:-translate-y-1 hover:border-white/30 hover:bg-white/[0.06] md:p-8">
+                  <div className="pointer-events-none absolute inset-0 opacity-0 transition duration-500 group-hover:opacity-100">
+                    <div className="absolute -right-20 -top-20 h-56 w-56 rounded-full bg-white/10 blur-3xl" />
                   </div>
 
-                  <div>
-                    <p className="text-xs uppercase tracking-[0.35em] text-white/35">
-                      {step.eyebrow}
-                    </p>
+                  <div className="relative z-10 flex items-start gap-5">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-white/15 bg-black/20 text-white/70">
+                      <Icon size={18} />
+                    </div>
 
-                    <h3 className="mt-3 text-2xl font-light tracking-[-0.04em] md:text-4xl">
-                      {step.title}
-                    </h3>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.35em] text-white/35">
+                        {step.eyebrow}
+                      </p>
 
-                    <p className="mt-4 max-w-lg text-sm leading-7 text-white/55 md:text-base">
-                      {step.text}
-                    </p>
+                      <h3 className="mt-3 text-2xl font-light tracking-[-0.04em] md:text-4xl">
+                        {step.title}
+                      </h3>
+
+                      <p className="mt-4 max-w-lg text-sm leading-7 text-white/55 md:text-base">
+                        {step.text}
+                      </p>
+                    </div>
                   </div>
                 </div>
               </div>

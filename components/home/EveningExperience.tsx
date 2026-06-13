@@ -121,10 +121,9 @@ export default function EveningExperience() {
   const current = items[activeIndex];
 
   return (
-    <>
+    <div id="experience">
       <section
-        id="experience"
-        ref={sectionRef}
+                ref={sectionRef}
         className="relative hidden h-[480vh] bg-[#080604] text-white md:block"
       >
         <div className="sticky top-0 grid h-screen grid-cols-1 overflow-hidden md:grid-cols-2">
@@ -239,6 +238,6 @@ export default function EveningExperience() {
           </article>
         ))}
       </section>
-    </>
+    </div>
   );
 }

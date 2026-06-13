@@ -11,7 +11,7 @@ export default function LocationSection() {
             src="/images/location/location.webp"
             alt="Fethiye Mediterranean Coast"
             fill
-            className="object-cover"
+            className="object-cover object-right"
             sizes="(max-width: 768px) 100vw, 55vw"
           />
 
