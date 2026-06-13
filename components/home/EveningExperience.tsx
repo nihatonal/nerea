@@ -123,7 +123,7 @@ export default function EveningExperience() {
   return (
     <div id="experience">
       <section
-                ref={sectionRef}
+        ref={sectionRef}
         className="relative hidden h-[480vh] bg-[#080604] text-white md:block"
       >
         <div className="sticky top-0 grid h-screen grid-cols-1 overflow-hidden md:grid-cols-2">
@@ -135,6 +135,7 @@ export default function EveningExperience() {
                   alt={item.title}
                   fill
                   priority
+                  loading="eager"
                   className="object-cover"
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw"
                 />

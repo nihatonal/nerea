@@ -99,7 +99,7 @@ export default function Footer() {
             </div>
 
             <p className="text-white/35">
-              © 2026 NEREA
+              © 2026 NEREA <br></br>Created by Bravix Creative
             </p>
           </div>
         </div>

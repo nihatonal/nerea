@@ -11,6 +11,7 @@ const FRAME_COUNT = 240;
 
 const currentFrame = (index: number, isMobile: boolean) => {
   const folder = isMobile ? "mobile" : "desktop";
+
   return `/images/nerea-hero/${folder}/frame_${String(index + 1).padStart(
     6,
     "0",
@@ -26,6 +27,7 @@ export default function NereaHeroSequence() {
   useEffect(() => {
     const canvas = canvasRef.current;
     const section = sectionRef.current;
+
     if (!canvas || !section) return;
 
     const context = canvas.getContext("2d");
@@ -33,23 +35,30 @@ export default function NereaHeroSequence() {
 
     const isMobile = window.innerWidth < 768;
 
-    const lenis = new Lenis({
-      duration: 1.15,
-      smoothWheel: true,
-      wheelMultiplier: 0.9,
-      touchMultiplier: 1.2,
-    });
+    let lenis: Lenis | null = null;
+    let raf: ((time: number) => void) | null = null;
 
-    const raf = (time: number) => {
-      lenis.raf(time * 1000);
-    };
+    if (!isMobile) {
+      lenis = new Lenis({
+        duration: 1.15,
+        smoothWheel: true,
+        wheelMultiplier: 0.9,
+      });
 
-    gsap.ticker.add(raf);
-    gsap.ticker.lagSmoothing(0);
-    lenis.on("scroll", ScrollTrigger.update);
+      raf = (time: number) => {
+        lenis?.raf(time * 1000);
+      };
+
+      gsap.ticker.add(raf);
+      gsap.ticker.lagSmoothing(0);
+
+      lenis.on("scroll", ScrollTrigger.update);
+    }
 
     const setCanvasSize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const dpr = isMobile
+        ? Math.min(window.devicePixelRatio || 1, 1.5)
+        : Math.min(window.devicePixelRatio || 1, 2);
 
       canvas.width = window.innerWidth * dpr;
       canvas.height = window.innerHeight * dpr;
@@ -64,6 +73,7 @@ export default function NereaHeroSequence() {
 
     const render = () => {
       const image = imagesRef.current[Math.round(frameRef.current.frame)];
+
       if (!image || !image.complete || image.naturalWidth === 0) return;
 
       context.clearRect(0, 0, window.innerWidth, window.innerHeight);
@@ -139,7 +149,7 @@ export default function NereaHeroSequence() {
         trigger: section,
         start: "top top",
         end: "bottom bottom",
-        scrub: 1,
+        scrub: isMobile ? 0.6 : 1,
       },
       onUpdate: function () {
         render();
@@ -157,10 +167,15 @@ export default function NereaHeroSequence() {
 
     return () => {
       tween.kill();
-      ScrollTrigger.getAll().forEach((trigger) => trigger.kill());
       window.removeEventListener("resize", handleResize);
-      gsap.ticker.remove(raf);
-      lenis.destroy();
+
+      if (raf) {
+        gsap.ticker.remove(raf);
+      }
+
+      if (lenis) {
+        lenis.destroy();
+      }
     };
   }, []);
 
@@ -231,6 +246,7 @@ export default function NereaHeroSequence() {
           <p className="text-[10px] uppercase tracking-[0.35em] text-white/45">
             Scroll
           </p>
+
           <div className="mx-auto mt-3 h-10 w-px overflow-hidden bg-white/20">
             <div className="h-1/2 w-full animate-pulse bg-white/70" />
           </div>
