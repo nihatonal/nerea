@@ -8,7 +8,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 gsap.registerPlugin(ScrollTrigger);
 
 const DESKTOP_FRAME_COUNT = 240;
-const MOBILE_FRAME_COUNT = 166;
+const MOBILE_FRAME_COUNT = 149;
 
 const currentFrame = (index: number, isMobile: boolean) => {
   const folder = isMobile ? "mobile" : "desktop";

@@ -42,13 +42,56 @@ export default function EveningExperience() {
   const textRef = useRef<HTMLDivElement | null>(null);
   const activeIndexRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
-  const [mobileIndex, setMobileIndex] = useState(0);
-  const touchStartY = useRef<number | null>(null);
 
   useEffect(() => {
-    if (window.innerWidth < 768) return;
     const section = sectionRef.current;
     if (!section) return;
+    const isMobile = window.innerWidth < 768;
+
+    if (isMobile) {
+      const mobileSlides = gsap.utils.toArray<HTMLElement>(
+        ".evening-mobile-slide",
+      );
+
+      gsap.set(mobileSlides, {
+        yPercent: 100,
+      });
+
+      gsap.set(mobileSlides[0], {
+        yPercent: 0,
+      });
+
+      const mobileTimeline = gsap.timeline({
+        scrollTrigger: {
+          trigger: "#experience-mobile",
+          start: "top top",
+          end: "+=240%",
+          scrub: 0.9,
+          pin: true,
+          anticipatePin: 1,
+        },
+      });
+
+      mobileTimeline
+        .to(mobileSlides[1], {
+          yPercent: 0,
+          duration: 1.2,
+          ease: "none",
+        })
+        .to(
+          mobileSlides[2],
+          {
+            yPercent: 0,
+            duration: 1.2,
+            ease: "none",
+          },
+          "+=0.35",
+        );
+
+      return () => {
+        mobileTimeline.kill();
+      };
+    }
 
     const images = gsap.utils.toArray<HTMLElement>(".evening-image");
 
@@ -190,86 +233,45 @@ export default function EveningExperience() {
         </div>
       </section>
       {/* Mobile stacked reveal */}
+      <section
+        id="experience-mobile"
+        className="relative h-svh overflow-hidden bg-[#080604] text-white md:hidden"
+      >
+        {items.map((item, index) => (
+          <article
+            key={item.key}
+            className="evening-mobile-slide absolute inset-0 overflow-hidden bg-[#080604]"
+            style={{
+              zIndex: index + 1,
+            }}
+          >
+            <Image
+              src={item.image}
+              alt={item.title}
+              fill
+              priority={index === 0}
+              className="object-cover"
+               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw"
+            />
 
-      {/* Mobile swipe slider */}
-      <section className="relative bg-[#080604] text-white md:hidden">
-        <div
-          className="relative h-svh overflow-hidden"
-          onTouchStart={(event) => {
-            touchStartY.current = event.touches[0].clientY;
-          }}
-          onTouchEnd={(event) => {
-            if (touchStartY.current === null) return;
+            <div className="absolute inset-0 bg-black/20" />
+            <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.25)_34%,transparent_70%)]" />
 
-            const touchEndY = event.changedTouches[0].clientY;
-            const diff = touchStartY.current - touchEndY;
+            <div className="absolute inset-x-0 bottom-0 px-7 pb-28">
+              <p className="text-[10px] uppercase tracking-[0.42em] text-white/50">
+                {item.eyebrow}
+              </p>
 
-            if (Math.abs(diff) > 60) {
-              if (diff > 0) {
-                setMobileIndex((current) =>
-                  current === items.length - 1 ? current : current + 1,
-                );
-              } else {
-                setMobileIndex((current) =>
-                  current === 0 ? current : current - 1,
-                );
-              }
-            }
+              <h2 className="mt-5 text-4xl font-light leading-[0.92] tracking-[-0.07em] text-white">
+                {item.title}
+              </h2>
 
-            touchStartY.current = null;
-          }}
-        >
-          {items.map((item, index) => (
-            <article
-              key={item.key}
-              className="absolute inset-0 overflow-hidden bg-[#080604] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
-              style={{
-                zIndex: index + 1,
-                transform:
-                  index <= mobileIndex ? "translateY(0%)" : "translateY(100%)",
-              }}
-            >
-              <Image
-                src={item.image}
-                alt={item.title}
-                fill
-                priority={index === 0}
-                className="object-cover"
-                sizes="100vw"
-              />
-
-              <div className="absolute inset-0 bg-black/20" />
-              <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.25)_34%,transparent_70%)]" />
-
-              <div className="absolute inset-x-0 bottom-0 px-7 pb-28">
-                <p className="text-[10px] uppercase tracking-[0.42em] text-white/50">
-                  {item.eyebrow}
-                </p>
-
-                <h2 className="mt-5 text-4xl font-light leading-[0.92] tracking-[-0.07em] text-white">
-                  {item.title}
-                </h2>
-
-                <p className="mt-6 max-w-sm text-sm leading-7 text-white/65">
-                  {item.text}
-                </p>
-              </div>
-            </article>
-          ))}
-
-          <div className="absolute bottom-10 left-7 z-20 flex gap-2">
-            {items.map((dot, dotIndex) => (
-              <button
-                key={dot.key}
-                onClick={() => setMobileIndex(dotIndex)}
-                className={`h-px transition-all duration-500 ${
-                  dotIndex === mobileIndex ? "w-12 bg-white" : "w-7 bg-white/25"
-                }`}
-                aria-label={`Go to ${dot.key}`}
-              />
-            ))}
-          </div>
-        </div>
+              <p className="mt-6 max-w-sm text-sm leading-7 text-white/65">
+                {item.text}
+              </p>
+            </div>
+          </article>
+        ))}
       </section>
     </div>
   );
