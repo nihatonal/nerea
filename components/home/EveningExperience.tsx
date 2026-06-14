@@ -42,6 +42,8 @@ export default function EveningExperience() {
   const textRef = useRef<HTMLDivElement | null>(null);
   const activeIndexRef = useRef(0);
   const [activeIndex, setActiveIndex] = useState(0);
+  const [mobileIndex, setMobileIndex] = useState(0);
+  const touchStartY = useRef<number | null>(null);
 
   useEffect(() => {
     if (window.innerWidth < 768) return;
@@ -189,55 +191,85 @@ export default function EveningExperience() {
       </section>
       {/* Mobile stacked reveal */}
 
+      {/* Mobile swipe slider */}
       <section className="relative bg-[#080604] text-white md:hidden">
-        {items.map((item, index) => (
-          <article
-            key={item.key}
-            className="sticky top-0 h-svh overflow-hidden bg-[#080604]"
-            style={{
-              zIndex: index + 1,
-            }}
-          >
-            <div className="absolute inset-0">
+        <div
+          className="relative h-svh overflow-hidden"
+          onTouchStart={(event) => {
+            touchStartY.current = event.touches[0].clientY;
+          }}
+          onTouchEnd={(event) => {
+            if (touchStartY.current === null) return;
+
+            const touchEndY = event.changedTouches[0].clientY;
+            const diff = touchStartY.current - touchEndY;
+
+            if (Math.abs(diff) > 60) {
+              if (diff > 0) {
+                setMobileIndex((current) =>
+                  current === items.length - 1 ? current : current + 1,
+                );
+              } else {
+                setMobileIndex((current) =>
+                  current === 0 ? current : current - 1,
+                );
+              }
+            }
+
+            touchStartY.current = null;
+          }}
+        >
+          {items.map((item, index) => (
+            <article
+              key={item.key}
+              className="absolute inset-0 overflow-hidden bg-[#080604] transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)]"
+              style={{
+                zIndex: index + 1,
+                transform:
+                  index <= mobileIndex ? "translateY(0%)" : "translateY(100%)",
+              }}
+            >
               <Image
                 src={item.image}
                 alt={item.title}
                 fill
                 priority={index === 0}
                 className="object-cover"
-                sizes="(max-width: 767px) 100vw, 50vw"
+                sizes="100vw"
               />
-            </div>
 
-            <div className="absolute inset-0 bg-black/20" />
-            <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.25)_34%,transparent_70%)]" />
+              <div className="absolute inset-0 bg-black/20" />
+              <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.25)_34%,transparent_70%)]" />
 
-            <div className="absolute inset-x-0 bottom-0 px-7 pb-28">
-              <p className="text-[10px] uppercase tracking-[0.42em] text-white/50">
-                {item.eyebrow}
-              </p>
+              <div className="absolute inset-x-0 bottom-0 px-7 pb-28">
+                <p className="text-[10px] uppercase tracking-[0.42em] text-white/50">
+                  {item.eyebrow}
+                </p>
 
-              <h2 className="mt-5 text-4xl font-light leading-[0.92] tracking-[-0.07em] text-white">
-                {item.title}
-              </h2>
+                <h2 className="mt-5 text-4xl font-light leading-[0.92] tracking-[-0.07em] text-white">
+                  {item.title}
+                </h2>
 
-              <p className="mt-6 max-w-sm text-sm leading-7 text-white/65">
-                {item.text}
-              </p>
-            </div>
+                <p className="mt-6 max-w-sm text-sm leading-7 text-white/65">
+                  {item.text}
+                </p>
+              </div>
+            </article>
+          ))}
 
-            <div className="absolute bottom-10 left-7 flex gap-2">
-              {items.map((dot, dotIndex) => (
-                <span
-                  key={dot.key}
-                  className={`h-px transition-all duration-500 ${
-                    dotIndex === index ? "w-12 bg-white" : "w-7 bg-white/25"
-                  }`}
-                />
-              ))}
-            </div>
-          </article>
-        ))}
+          <div className="absolute bottom-10 left-7 z-20 flex gap-2">
+            {items.map((dot, dotIndex) => (
+              <button
+                key={dot.key}
+                onClick={() => setMobileIndex(dotIndex)}
+                className={`h-px transition-all duration-500 ${
+                  dotIndex === mobileIndex ? "w-12 bg-white" : "w-7 bg-white/25"
+                }`}
+                aria-label={`Go to ${dot.key}`}
+              />
+            ))}
+          </div>
+        </div>
       </section>
     </div>
   );
