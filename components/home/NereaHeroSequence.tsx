@@ -151,7 +151,6 @@ export default function NereaHeroSequence() {
     }
 
     let tween: gsap.core.Tween | null = null;
-    let mobileScrollTrigger: ScrollTrigger | null = null;
 
     if (isMobile) {
       gsap.set(section, { height: "100svh" });
@@ -177,13 +176,6 @@ export default function NereaHeroSequence() {
         });
       };
 
-      mobileScrollTrigger = ScrollTrigger.create({
-        trigger: section,
-        start: "top 75%",
-        once: true,
-        onEnter: playMobileHero,
-      });
-
       section.addEventListener("touchstart", playMobileHero, { passive: true });
       section.addEventListener("click", playMobileHero);
 
@@ -196,7 +188,6 @@ export default function NereaHeroSequence() {
       window.addEventListener("resize", handleResize);
 
       return () => {
-        mobileScrollTrigger?.kill();
         section.removeEventListener("touchstart", playMobileHero);
         section.removeEventListener("click", playMobileHero);
         window.removeEventListener("resize", handleResize);
