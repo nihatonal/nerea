@@ -21,11 +21,9 @@ const currentFrame = (index: number, isMobile: boolean) => {
 
 export default function NereaHeroSequence() {
   const sectionRef = useRef<HTMLElement | null>(null);
-  const stickyRef = useRef<HTMLDivElement | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const imagesRef = useRef<HTMLImageElement[]>([]);
   const frameRef = useRef({ frame: 0 });
-  const hasPlayedMobileRef = useRef(false);
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -143,71 +141,11 @@ export default function NereaHeroSequence() {
       imagesRef.current[i] = img;
 
       img.onload = () => {
-        if (i === 0) {
-          render();
-          updateTextByProgress(0);
-        }
+        if (i === 0) render();
       };
     }
 
-    let tween: gsap.core.Tween | null = null;
-
-    if (isMobile) {
-      gsap.set(section, { height: "100svh" });
-      updateTextByProgress(0);
-
-      const lockScroll = () => {
-        document.documentElement.style.overflow = "hidden";
-        document.body.style.overflow = "hidden";
-      };
-
-      const unlockScroll = () => {
-        document.documentElement.style.overflow = "";
-        document.body.style.overflow = "";
-      };
-
-      const playMobileHero = () => {
-        if (hasPlayedMobileRef.current) return;
-
-        hasPlayedMobileRef.current = true;
-        lockScroll();
-
-        gsap.to(frameRef.current, {
-          frame: frameCount - 1,
-          duration: 4.2,
-          ease: "power2.inOut",
-          snap: "frame",
-          onUpdate: () => {
-            render();
-            updateTextByProgress(frameRef.current.frame / (frameCount - 1));
-          },
-          onComplete: () => {
-            updateTextByProgress(1);
-            unlockScroll();
-          },
-        });
-      };
-
-      section.addEventListener("touchstart", playMobileHero, { passive: true });
-      section.addEventListener("click", playMobileHero);
-
-      const handleResize = () => {
-        setCanvasSize();
-        render();
-        ScrollTrigger.refresh();
-      };
-
-      window.addEventListener("resize", handleResize);
-
-      return () => {
-        section.removeEventListener("touchstart", playMobileHero);
-        section.removeEventListener("click", playMobileHero);
-        window.removeEventListener("resize", handleResize);
-        unlockScroll();
-      };
-    }
-
-    tween = gsap.to(frameRef.current, {
+    const tween = gsap.to(frameRef.current, {
       frame: frameCount - 1,
       ease: "none",
       snap: "frame",
@@ -215,7 +153,7 @@ export default function NereaHeroSequence() {
         trigger: section,
         start: "top top",
         end: "bottom bottom",
-        scrub: 1,
+        scrub: isMobile ? 0.6 : 1,
       },
       onUpdate: function () {
         render();
@@ -232,7 +170,7 @@ export default function NereaHeroSequence() {
     window.addEventListener("resize", handleResize);
 
     return () => {
-      tween?.kill();
+      tween.kill();
       window.removeEventListener("resize", handleResize);
 
       if (raf) {
@@ -246,11 +184,8 @@ export default function NereaHeroSequence() {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative h-svh bg-black md:h-[500vh]">
-      <div
-        ref={stickyRef}
-        className="sticky top-0 h-svh overflow-hidden md:h-screen"
-      >
+    <section ref={sectionRef} className="relative h-[500vh] bg-black">
+      <div className="sticky top-0 h-svh overflow-hidden md:h-screen">
         <canvas ref={canvasRef} className="h-full w-full" />
 
         <div className="pointer-events-none absolute inset-0 bg-black/25" />
@@ -313,7 +248,7 @@ export default function NereaHeroSequence() {
           className="absolute bottom-8 left-1/2 -translate-x-1/2 text-center"
         >
           <p className="text-[10px] uppercase tracking-[0.35em] text-white/45">
-            Tap / Scroll
+            Scroll
           </p>
 
           <div className="mx-auto mt-3 h-10 w-px overflow-hidden bg-white/20">
