@@ -7,7 +7,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 gsap.registerPlugin(ScrollTrigger);
 
-const FRAME_COUNT = 240;
+const DESKTOP_FRAME_COUNT = 240;
+const MOBILE_FRAME_COUNT = 150;
 
 const currentFrame = (index: number, isMobile: boolean) => {
   const folder = isMobile ? "mobile" : "desktop";
@@ -34,6 +35,10 @@ export default function NereaHeroSequence() {
     if (!context) return;
 
     const isMobile = window.innerWidth < 768;
+    const frameCount = isMobile ? MOBILE_FRAME_COUNT : DESKTOP_FRAME_COUNT;
+
+    imagesRef.current = [];
+    frameRef.current.frame = 0;
 
     let lenis: Lenis | null = null;
     let raf: ((time: number) => void) | null = null;
@@ -51,7 +56,6 @@ export default function NereaHeroSequence() {
 
       gsap.ticker.add(raf);
       gsap.ticker.lagSmoothing(0);
-
       lenis.on("scroll", ScrollTrigger.update);
     }
 
@@ -131,7 +135,7 @@ export default function NereaHeroSequence() {
 
     setCanvasSize();
 
-    for (let i = 0; i < FRAME_COUNT; i++) {
+    for (let i = 0; i < frameCount; i++) {
       const img = new Image();
       img.src = currentFrame(i, isMobile);
       imagesRef.current[i] = img;
@@ -142,7 +146,7 @@ export default function NereaHeroSequence() {
     }
 
     const tween = gsap.to(frameRef.current, {
-      frame: FRAME_COUNT - 1,
+      frame: frameCount - 1,
       ease: "none",
       snap: "frame",
       scrollTrigger: {
