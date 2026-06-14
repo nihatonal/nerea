@@ -44,54 +44,9 @@ export default function EveningExperience() {
   const [activeIndex, setActiveIndex] = useState(0);
 
   useEffect(() => {
+    if (window.innerWidth < 768) return;
     const section = sectionRef.current;
     if (!section) return;
-    const isMobile = window.innerWidth < 768;
-
-    if (isMobile) {
-      const mobileSlides = gsap.utils.toArray<HTMLElement>(
-        ".evening-mobile-slide",
-      );
-
-      gsap.set(mobileSlides, {
-        yPercent: 100,
-      });
-
-      gsap.set(mobileSlides[0], {
-        yPercent: 0,
-      });
-
-      const mobileTimeline = gsap.timeline({
-        scrollTrigger: {
-          trigger: "#experience-mobile",
-          start: "top top",
-          end: "+=240%",
-          scrub: 0.9,
-          pin: true,
-          anticipatePin: 1,
-        },
-      });
-
-      mobileTimeline
-        .to(mobileSlides[1], {
-          yPercent: 0,
-          duration: 1.2,
-          ease: "none",
-        })
-        .to(
-          mobileSlides[2],
-          {
-            yPercent: 0,
-            duration: 1.2,
-            ease: "none",
-          },
-          "+=0.35",
-        );
-
-      return () => {
-        mobileTimeline.kill();
-      };
-    }
 
     const images = gsap.utils.toArray<HTMLElement>(".evening-image");
 
@@ -233,26 +188,26 @@ export default function EveningExperience() {
         </div>
       </section>
       {/* Mobile stacked reveal */}
-      <section
-        id="experience-mobile"
-        className="relative h-svh overflow-hidden bg-[#080604] text-white md:hidden"
-      >
+
+      <section className="relative bg-[#080604] text-white md:hidden">
         {items.map((item, index) => (
           <article
             key={item.key}
-            className="evening-mobile-slide absolute inset-0 overflow-hidden bg-[#080604]"
+            className="sticky top-0 h-svh overflow-hidden bg-[#080604]"
             style={{
               zIndex: index + 1,
             }}
           >
-            <Image
-              src={item.image}
-              alt={item.title}
-              fill
-              priority={index === 0}
-              className="object-cover"
-               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw"
-            />
+            <div className="absolute inset-0">
+              <Image
+                src={item.image}
+                alt={item.title}
+                fill
+                priority={index === 0}
+                className="object-cover"
+                sizes="(max-width: 767px) 100vw, 50vw"
+              />
+            </div>
 
             <div className="absolute inset-0 bg-black/20" />
             <div className="absolute inset-0 bg-[linear-gradient(to_top,rgba(0,0,0,0.72)_0%,rgba(0,0,0,0.25)_34%,transparent_70%)]" />
@@ -269,6 +224,17 @@ export default function EveningExperience() {
               <p className="mt-6 max-w-sm text-sm leading-7 text-white/65">
                 {item.text}
               </p>
+            </div>
+
+            <div className="absolute bottom-10 left-7 flex gap-2">
+              {items.map((dot, dotIndex) => (
+                <span
+                  key={dot.key}
+                  className={`h-px transition-all duration-500 ${
+                    dotIndex === index ? "w-12 bg-white" : "w-7 bg-white/25"
+                  }`}
+                />
+              ))}
             </div>
           </article>
         ))}
